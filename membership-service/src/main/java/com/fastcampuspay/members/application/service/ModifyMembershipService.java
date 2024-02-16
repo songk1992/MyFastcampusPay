@@ -1,12 +1,12 @@
 package com.fastcampuspay.members.application.service;
 
+import com.fastcampuspay.common.UseCase;
 import com.fastcampuspay.members.adapter.out.persistence.MembershipJpaEntity;
 import com.fastcampuspay.members.adapter.out.persistence.MembershipMapper;
 import com.fastcampuspay.members.application.port.in.ModifyMembershipCommand;
 import com.fastcampuspay.members.application.port.in.ModifyMembershipUseCase;
 import com.fastcampuspay.members.application.port.out.ModifyMembershipPort;
 import com.fastcampuspay.members.domain.Membership;
-import common.UseCase;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
