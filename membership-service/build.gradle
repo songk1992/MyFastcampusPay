@@ -2,10 +2,11 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.2'
     id 'io.spring.dependency-management' version '1.1.4'
+    id 'com.palantir.docker' version '0.35.0'
 }
 
 group = 'com.fastcampuspay.membership'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 
 java {
     sourceCompatibility = '21'
@@ -44,4 +45,20 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+docker {
+    println(tasks.bootJar.outputs.files)
+
+    // image name
+    name rootProject.name + '-' + project.name + ':' + version
+
+    // docker file
+    dockerfile file('./Dockerfile')
+
+    // file to be copied to dockerfile
+    files tasks.bootJar.outputs.files
+
+    // args
+    buildArgs(['JAR_FILE': tasks.bootJar.outputs.files.singleFile.name])
 }
