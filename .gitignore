@@ -201,3 +201,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+## DB ##
+/db/data/**
