@@ -31,7 +31,7 @@ public class RegisterBankAccountController {
             return null;
         }
 
-        return registerBankAccountUseCase.registerBankAccount(command);
+        return registeredBankAccount;
     }
 
 
