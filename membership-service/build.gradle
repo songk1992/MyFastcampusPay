@@ -41,7 +41,7 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    runtimeOnly 'mysql:mysql-connector-java:8.0.32'
+    runtimeOnly 'org.postgresql:postgresql'
 }
 
 tasks.named('test') {
@@ -55,7 +55,7 @@ docker {
     name rootProject.name + '-' + project.name + ':' + version
 
     // docker file
-    dockerfile file('./Dockerfile')
+    dockerfile file('../Dockerfile')
 
     // file to be copied to dockerfile
     files tasks.bootJar.outputs.files
