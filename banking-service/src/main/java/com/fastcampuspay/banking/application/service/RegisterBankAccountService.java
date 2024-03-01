@@ -1,11 +1,14 @@
 package com.fastcampuspay.banking.application.service;
 
-import com.fastcampuspay.banking.adapter.out.persistence.RegisterBankAccountJpaEntity;
-import com.fastcampuspay.banking.adapter.out.persistence.RegisterBankAccountMapper;
+import com.fastcampuspay.banking.adapter.out.external.bank.BankAccount;
+import com.fastcampuspay.banking.adapter.out.external.bank.GetBankAccountRequest;
+import com.fastcampuspay.banking.adapter.out.persistence.RegisteredBankAccountJpaEntity;
+import com.fastcampuspay.banking.adapter.out.persistence.RegisteredBankAccountMapper;
 import com.fastcampuspay.banking.application.port.in.RegisterBankAccountCommand;
 import com.fastcampuspay.banking.application.port.in.RegisterBankAccountUseCase;
 import com.fastcampuspay.banking.application.port.out.RegisterBankAccountPort;
-import com.fastcampuspay.banking.domain.RegisterBankAccount;
+import com.fastcampuspay.banking.application.port.out.RequestBankAccountInfoPort;
+import com.fastcampuspay.banking.domain.RegisteredBankAccount;
 import com.fastcampuspay.common.UseCase;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,27 +19,37 @@ import lombok.RequiredArgsConstructor;
 public class RegisterBankAccountService implements RegisterBankAccountUseCase {
 
     private final RegisterBankAccountPort registerBankAccountPort;
-    private final RegisterBankAccountMapper registerBankAccountMapper;
+    private final RegisteredBankAccountMapper registeredBankAccountMapper;
+    private final RequestBankAccountInfoPort requestBankAccountInfoPort;
 
     @Override
-    public RegisterBankAccount registerBankAccount(RegisterBankAccountCommand command) {
+    public RegisteredBankAccount registerBankAccount(RegisterBankAccountCommand command) {
 
         // 은행 계좌를 등록해야 하는 서비스
         // 1. 등록된 계좌인지 확인
+        // Biz Logic -> External Sys
+        // Port -> Adapter -> External System
+        // Port
+        // 실제 외부의 은행 계좌 정보를 GET
+        command.getBankName();
+        command.getBankAccountNumber();
 
-        // 2. 등록 가능한 계좌라면 등록
+        // 실제 외부의 은행계좌 정보를 Get
+        BankAccount accountInfo = requestBankAccountInfoPort.getBankAccountInfo(new GetBankAccountRequest(command.getBankName(), command.getBankAccountNumber()));
+        boolean accountIsValid = accountInfo.isValid();
 
+        // 2. 등록 가능한 계좌라면 등록. 성공하면, 등록에 성공한 등록 정보를 리턴
         // 2-1. 등록 가능하지 않은 계좌라면 에러 리턴
-
-
-        RegisterBankAccountJpaEntity jpaEntity = registerBankAccountPort.createRegisterBankAccount(
-                new RegisterBankAccount.RegisterBankAccountId(command.getBankAccountNumber()),
-                new RegisterBankAccount.MembershipId(command.getMembershipId()),
-                new RegisterBankAccount.BankName(command.getBankName()),
-                new RegisterBankAccount.BankAccountNumber(command.getBankAccountNumber()),
-                new RegisterBankAccount.LinkedStatusIsValid(command.isValid())
-        );
-
-        return registerBankAccountMapper.mapToDomainEntity(jpaEntity);
+        if (accountIsValid) {
+            RegisteredBankAccountJpaEntity savedAccountInfo = registerBankAccountPort.createRegisteredBankAccount(
+                    new RegisteredBankAccount.RegisterBankAccountId(command.getBankAccountNumber()),
+                    new RegisteredBankAccount.MembershipId(command.getMembershipId()),
+                    new RegisteredBankAccount.BankName(command.getBankName()),
+                    new RegisteredBankAccount.BankAccountNumber(command.getBankAccountNumber()),
+                    new RegisteredBankAccount.LinkedStatusIsValid(command.isValid())
+            );
+            return registeredBankAccountMapper.mapToDomainEntity(savedAccountInfo);
+        }
+        return null;
     }
 }

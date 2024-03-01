@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterBankAccountJpaEntity {
+public class RegisteredBankAccountJpaEntity {
 
     @Id
     @GeneratedValue
@@ -23,7 +23,7 @@ public class RegisterBankAccountJpaEntity {
     private String bankAccountNumber;
     private boolean linkedStatusIsValid;
 
-    public RegisterBankAccountJpaEntity(String membershipId, String bankName, String bankAccountNumber, boolean linkedStatusIsValid) {
+    public RegisteredBankAccountJpaEntity(String membershipId, String bankName, String bankAccountNumber, boolean linkedStatusIsValid) {
         this.membershipId = membershipId;
         this.bankName = bankName;
         this.bankAccountNumber = bankAccountNumber;

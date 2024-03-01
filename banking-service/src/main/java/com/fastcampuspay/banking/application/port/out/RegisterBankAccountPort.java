@@ -1,14 +1,14 @@
 package com.fastcampuspay.banking.application.port.out;
 
-import com.fastcampuspay.banking.adapter.out.persistence.RegisterBankAccountJpaEntity;
-import com.fastcampuspay.banking.domain.RegisterBankAccount;
+import com.fastcampuspay.banking.adapter.out.persistence.RegisteredBankAccountJpaEntity;
+import com.fastcampuspay.banking.domain.RegisteredBankAccount;
 
 public interface RegisterBankAccountPort {
-    RegisterBankAccountJpaEntity createRegisterBankAccount(
-            RegisterBankAccount.RegisterBankAccountId registerBankAccountId,
-            RegisterBankAccount.MembershipId membershipId,
-            RegisterBankAccount.BankName bankName,
-            RegisterBankAccount.BankAccountNumber bankAccountNumber,
-            RegisterBankAccount.LinkedStatusIsValid linkedStatusIsValid
+    RegisteredBankAccountJpaEntity createRegisteredBankAccount(
+            RegisteredBankAccount.RegisterBankAccountId registerBankAccountId,
+            RegisteredBankAccount.MembershipId membershipId,
+            RegisteredBankAccount.BankName bankName,
+            RegisteredBankAccount.BankAccountNumber bankAccountNumber,
+            RegisteredBankAccount.LinkedStatusIsValid linkedStatusIsValid
     );
 }
