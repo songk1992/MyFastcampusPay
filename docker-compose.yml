@@ -47,7 +47,8 @@ services:
   postgresql:
     image: postgres:16.1
     container_name: postgresql
-
+    networks:
+      - fastcampuspay_network
     ports:
       - ${POSTGRES_EXT_PORT}:5432
     expose:
@@ -94,19 +95,20 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
 
   banking-service:
-    image: fastcampus-pay-banking-service:0.0.1-SNAPSHOT
+    image: my-fastcampus-pay-banking-service:0.0.1
     networks:
       - fastcampuspay_network
     ports:
       - "8082:8080"
     depends_on:
-      - axon-server
+      #      - axon-server
       - postgresql
     environment:
-      - AXON_AXONSERVER_SERVERS=axon-server:8124
-      - AXON_SERIALIZER_EVENTS=jackson
-      - AXON_SERIALIZER_MESSAGES=jackson
-      - AXON_SERIALIZER_GENERAL=xstream
+      #      - AXON_AXONSERVER_SERVERS=axon-server:8124
+      #      - AXON_SERIALIZER_EVENTS=jackson
+      #      - AXON_SERIALIZER_MESSAGES=jackson
+      #      - AXON_SERIALIZER_GENERAL=xstream
+      - SPRING_PROFILES_ACTIVE=prod
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
@@ -125,6 +127,7 @@ services:
       - AXON_SERIALIZER_EVENTS=jackson
       - AXON_SERIALIZER_MESSAGES=jackson
       - AXON_SERIALIZER_GENERAL=xstream
+      - SPRING_PROFILES_ACTIVE=prod
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
@@ -143,6 +146,7 @@ services:
       - AXON_SERIALIZER_EVENTS=jackson
       - AXON_SERIALIZER_MESSAGES=jackson
       - AXON_SERIALIZER_GENERAL=xstream
+      - SPRING_PROFILES_ACTIVE=prod
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
@@ -161,6 +165,7 @@ services:
       - AXON_SERIALIZER_EVENTS=jackson
       - AXON_SERIALIZER_MESSAGES=jackson
       - AXON_SERIALIZER_GENERAL=xstream
+      - SPRING_PROFILES_ACTIVE=prod
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
@@ -179,6 +184,7 @@ services:
       - AXON_SERIALIZER_EVENTS=jackson
       - AXON_SERIALIZER_MESSAGES=jackson
       - AXON_SERIALIZER_GENERAL=xstream
+      - SPRING_PROFILES_ACTIVE=prod
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
@@ -197,6 +203,7 @@ services:
       - AXON_SERIALIZER_EVENTS=jackson
       - AXON_SERIALIZER_MESSAGES=jackson
       - AXON_SERIALIZER_GENERAL=xstream
+      - SPRING_PROFILES_ACTIVE=prod
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
