@@ -1,18 +1,21 @@
-version: '3'
+version: '3.9'
+
 services:
   zookeeper:
-    image: 'arm64v8/zookeeper:3.8'
+    image: 'bitnami/zookeeper:latest'
     networks:
       - fastcampuspay_network
     ports:
       - '2181:2181'
+    expose:
+      - "2181"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_TLS_CLIENT_AUTH=none
       - ZOO_TLS_QUORUM_CLIENT_AUTH=none
 
   kafka:
-    image: 'bitnami/kafka:3.4.0'
+    image: 'bitnami/kafka:latest'
     networks:
       - fastcampuspay_network
     ports:
@@ -54,9 +57,9 @@ services:
     expose:
       - "5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
 
     # 볼륨 설정
     volumes:
@@ -89,10 +92,13 @@ services:
       #      - AXON_SERIALIZER_EVENTS=jackson
       #      - AXON_SERIALIZER_MESSAGES=jackson
       #      - AXON_SERIALIZER_GENERAL=xstream
-      SPRING_PROFILES_ACTIVE: prod
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      - SPRING_PROFILES_ACTIVE=prod
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
+      - LOGGING_TOPIC=fastcampus.logging.out.stdout
+  #      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
 
   banking-service:
     image: my-fastcampus-pay-banking-service:0.0.1
@@ -112,15 +118,17 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+      - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
+      - LOGGING_TOPIC=fastcampus.logging.out.stdout
 
   money-service:
-    image: fastcampus-pay-money-service:0.0.1-SNAPSHOT
+    image: my-fastcampus-pay-money-service:0.0.1
     networks:
       - fastcampuspay_network
     ports:
       - "8083:8080"
     depends_on:
-      - axon-server
+      #      - axon-server
       - postgresql
     environment:
       - AXON_AXONSERVER_SERVERS=axon-server:8124
@@ -131,6 +139,8 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+      - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
+      - LOGGING_TOPIC=fastcampus.logging.out.stdout
 
   money-local-service:
     image: fastcampus-pay-money-local-service:0.0.1-SNAPSHOT
@@ -150,6 +160,21 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+
+  logging-consumber-service:
+    image: my-fastcampus-pay-logging-consumer:0.0.1
+    networks:
+      - fastcampuspay_network
+    depends_on:
+      - kafka
+      - zookeeper
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
+      - LOGGING_TOPIC=fastcampus.logging.out.stdout
 
   remittance-service:
     image: fastcampus-pay-remittance-service:0.0.1-SNAPSHOT

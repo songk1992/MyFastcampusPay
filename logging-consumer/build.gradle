@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.2'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'com.palantir.docker' version '0.35.0'
+}
+
+group = 'com.fastcampuspay.logging-consumer'
+version = '0.0.1'
+
+java {
+    sourceCompatibility = '21'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-aop:3.2.3'
+    implementation 'org.springframework.kafka:spring-kafka:3.1.2'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    runtimeOnly 'org.postgresql:postgresql'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+docker {
+    println(tasks.bootJar.outputs.files)
+
+    // image name
+    name rootProject.name + '-' + project.name + ':' + version
+
+    // docker file
+    dockerfile file('../Dockerfile')
+
+    // file to be copied to dockerfile
+    files tasks.bootJar.outputs.files
+
+    // args
+    buildArgs(['JAR_FILE': tasks.bootJar.outputs.files.singleFile.name])
+}
