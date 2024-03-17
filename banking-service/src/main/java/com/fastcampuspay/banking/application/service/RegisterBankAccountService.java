@@ -6,6 +6,8 @@ import com.fastcampuspay.banking.adapter.out.persistence.RegisteredBankAccountJp
 import com.fastcampuspay.banking.adapter.out.persistence.RegisteredBankAccountMapper;
 import com.fastcampuspay.banking.application.port.in.RegisterBankAccountCommand;
 import com.fastcampuspay.banking.application.port.in.RegisterBankAccountUseCase;
+import com.fastcampuspay.banking.application.port.out.GetMembershipPort;
+import com.fastcampuspay.banking.application.port.out.MembershipStatus;
 import com.fastcampuspay.banking.application.port.out.RegisterBankAccountPort;
 import com.fastcampuspay.banking.application.port.out.RequestBankAccountInfoPort;
 import com.fastcampuspay.banking.domain.RegisteredBankAccount;
@@ -18,12 +20,20 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class RegisterBankAccountService implements RegisterBankAccountUseCase {
 
+    private final GetMembershipPort getMembershipPort;
     private final RegisterBankAccountPort registerBankAccountPort;
     private final RegisteredBankAccountMapper registeredBankAccountMapper;
     private final RequestBankAccountInfoPort requestBankAccountInfoPort;
 
     @Override
     public RegisteredBankAccount registerBankAccount(RegisterBankAccountCommand command) {
+
+        // call membership svc 정상인지 확인
+        // call external bank svc 정상인지 확인
+        MembershipStatus membershipStatus = getMembershipPort.getMembership(command.getMembershipId());
+        if (!membershipStatus.isValid()) {
+            return null;
+        }
 
         // 은행 계좌를 등록해야 하는 서비스
         // 1. 등록된 계좌인지 확인
